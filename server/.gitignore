@@ -1,0 +1,44 @@
+# Archivos de entorno de Python
+*.pyc
+__pycache__/
+
+# Entornos virtuales
+env/
+venv/
+mi_entorno/
+
+# Archivos de configuración del editor
+.vscode/
+.idea/
+
+# Archivos de configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de bases de datos locales
+*.sqlite3
+
+# Archivos de Django (opcional, si no quieres seguirlos)
+/static/
+/media/
+
+# Archivos de migración de Django (generalmente se suben)
+# */migrations/
+
+# Archivos de logs
+*.log
+
+# Archivos de caché
+*.cache
+
+# Archivos de empaquetado
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Seguridad (IGNORA el .env real)
+.env
+
+# Ejemplo de variables de entorno (NO IGNORAR)
+!.env.example

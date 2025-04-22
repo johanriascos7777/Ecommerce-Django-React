@@ -1,0 +1,22 @@
+Django
+django-cors-headers~=4.3.0 
+django-environ~=0.10.0 
+djangorestframework~=3.14.0 
+djoser~=2.3.0 
+social-auth-app-django~=5.0.0 
+django-ckeditor~=6.5.0 
+pytz # ya no se necesita instalar pytz, Django lo incluye por defecto.
+Pillow~=10.0.0 
+mutagen~=1.47.0 
+psycopg2-binary
+argon2-cffi~=23.1.0 
+django-environ~=0.10.0
+stripe~=5.0.0 
+braintree~=4.22.0 
+pyJWT~=2.8.0 
+boto3~=1.33.0 
+django-storages~=1.14.0 
+markdown~=3.5.0
+gunicorn~=22.0.0 
+whitenoise~=6.0.0
+requests~=2.31.0 
