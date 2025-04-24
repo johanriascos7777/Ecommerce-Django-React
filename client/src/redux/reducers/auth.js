@@ -35,6 +35,7 @@ export default function Auth(state = initialState, action) {
         case USER_LOADED_SUCCESS:
             return {
                 ...state,
+                // isAuthenticated: true, ¿se validad con el backend?
                 user: payload,
             }
         case USER_LOADED_FAIL:
