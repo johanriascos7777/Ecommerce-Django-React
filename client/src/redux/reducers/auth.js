@@ -9,6 +9,11 @@ import {
     REMOVE_AUTH_LOADING,
     USER_LOADED_SUCCESS,
     USER_LOADED_FAIL,
+    AUTHENTICATED_SUCCESS,
+    AUTHENTICATED_FAIL,
+    REFRESH_SUCCESS,
+    REFRESH_FAIL,
+
 } from '../actions/types'
 
 const initialState = {
@@ -43,6 +48,20 @@ export default function Auth(state = initialState, action) {
                 ...state,
                 user: null,
             }
+        case AUTHENTICATED_SUCCESS:
+                return {
+                    ...state,
+                    isAuthenticated: true
+                }
+        case AUTHENTICATED_FAIL:
+                localStorage.removeItem('access');
+                localStorage.removeItem('refresh');
+                return {
+                    ...state,
+                    isAuthenticated: false,
+                    access: null,
+                    refresh: null
+                }    
 
         case LOGIN_SUCCESS:
             localStorage.setItem('access', payload.access);
@@ -59,9 +78,18 @@ export default function Auth(state = initialState, action) {
             return {
                 ...state
             }
+
+        case REFRESH_SUCCESS:
+                localStorage.setItem('access', payload.access);
+                return {
+                    ...state,
+                    access: localStorage.getItem('access')
+                }
+
         case SIGNUP_SUCCESS:
         case SIGNUP_FAIL:
         case LOGIN_FAIL:
+        case REFRESH_FAIL:
             localStorage.removeItem('access');
             localStorage.removeItem('refresh');
             return {
