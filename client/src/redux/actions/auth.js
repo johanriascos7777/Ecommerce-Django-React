@@ -71,7 +71,7 @@ export const load_user = () => async dispatch => {
     if (localStorage.getItem('access')) {
         const config = {
             headers: {
-                "Authorization": `JWT ${localStorage.getItem('access')}`,
+             "Authorization": `Bearer ${localStorage.getItem('access')}`, // Se escribe Bearer y no JWT 
                 "accept": "application/json"
             }
         };
