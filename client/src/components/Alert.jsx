@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 // Importamos los íconos desde Heroicons
-import { CheckCircleIcon } from '@heroicons/react/solid'
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 // Importamos los hooks de react-redux
 import { useDispatch, useSelector } from 'react-redux'
 // Aquí puedes importar cualquier acción que quieras despachar (por ejemplo, para ocultar la alerta después de un tiempo)
