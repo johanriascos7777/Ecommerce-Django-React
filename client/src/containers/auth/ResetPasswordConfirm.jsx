@@ -1,44 +1,40 @@
 import Layout from "../../hocs/Layout";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/actions/auth";
-import { Oval } from "react-loader-spinner";    // ← Spinner Oval importado
-import { Navigate } from "react-router";        // ← Para redireccionar tras login
-import { Link } from "react-router";
+import { reset_password_confirm } from "../../redux/actions/auth";
+import { Oval } from "react-loader-spinner";
+import { Navigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-export default function Login() {
+export default function Reset_Password_Confirm() {
   const dispatch = useDispatch();
-
-  // 1. Obtenemos el estado de loading desde Redux (state.Auth.loading)
+  const params = useParams();
   const loading = useSelector((state) => state.Auth.loading);
+  const [requestSent, setRequestSent] = useState(false);
+  const [formData, setFormData] = useState({
+    new_password: "",
+    re_new_password: "",
+  });
 
-  // 2. Control para saber cuándo redirigir al usuario tras el dispatch
-  const [activated, setActivated] = useState(false);
+  const { new_password, re_new_password } = formData;
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const { email, password } = formData;
-
-  // 3. Actualizamos el estado local al cambiar inputs
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  // 4. Al hacer submit, lanzamos la acción de login y activamos la redirección
   const onSubmit = (e) => {
     e.preventDefault();
-    dispatch(login(email, password));
-    setActivated(true);
+    const { uid, token } = params;
+    if (new_password === re_new_password) {
+      dispatch(reset_password_confirm(uid, token, new_password, re_new_password));
+      setRequestSent(true);
+    }
   };
 
-  // 5. Si ya accionamos el login, redirigimos al home
-  if (activated) {
+  if (requestSent && !loading) {
     return <Navigate to="/" />;
   }
 
@@ -52,9 +48,9 @@ export default function Login() {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-            Sign in to your account
+            Set your new password
           </h2>
-          <span className="text-gray-900">¿Don't have an account? <Link className="text-blue-500" to="/signup">Sign up here</Link> </span>
+          <span className="text-gray-900">¿Recordaste tu contraseña? <Link className="text-blue-500" to="/login">Login here</Link> </span>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -64,64 +60,47 @@ export default function Login() {
                 htmlFor="email"
                 className="block text-sm/6 font-medium text-gray-900"
               >
-                Email address
+                Password
               </label>
               <div className="mt-2">
                 <input
-                  value={email}
-                  name="email"
-                  type="email"
+                  value={new_password}
+                  name="new_password"
+                  type="password"
+                  placeholder="Password"
                   required
                   onChange={onChange}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
-
             <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <Link
-                   to="/reset_password"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
+              <label
+                htmlFor="email"
+                className="block text-sm/6 font-medium text-gray-900"
+              >
+                Repeat password
+              </label>
               <div className="mt-2">
                 <input
-                  value={password}
-                  onChange={onChange}
-                  id="password"
-                  name="password"
+                  value={re_new_password}
+                  name="re_new_password"
                   type="password"
+                  placeholder="Repeat password"
                   required
+                  onChange={onChange}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
 
             <div>
-              {/* 6. Botón con condicional de loading
-              
-                El botón de envío lleva el atributo disabled={loading} para evitar múltiples submissions mientras carga.
-                Dentro del botón, renderizamos el spinner <Oval /> si loading es true; en caso contrario, mostramos "Login".
-
-              */}
               <button
                 type="submit"
-                disabled={loading} // ← Deshabilitar mientras carga
+                disabled={loading}
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-70"
               >
                 {loading ? (
-                  // 7. Spinner Oval cuando loading === true
                   <Oval
                     height={20}
                     width={20}
@@ -135,8 +114,7 @@ export default function Login() {
                     strokeWidthSecondary={2}
                   />
                 ) : (
-                  // 8. Texto normal cuando no está cargando
-                  "Login"
+                  "Reset password"
                 )}
               </button>
             </div>

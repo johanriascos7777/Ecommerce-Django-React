@@ -1,12 +1,13 @@
 import Layout from "../../hocs/Layout";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/actions/auth";
+import { reset_password } from "../../redux/actions/auth";
 import { Oval } from "react-loader-spinner";    // ← Spinner Oval importado
 import { Navigate } from "react-router";        // ← Para redireccionar tras login
 import { Link } from "react-router";
 
-export default function Login() {
+
+export default function Reset_Password() {
   const dispatch = useDispatch();
 
   // 1. Obtenemos el estado de loading desde Redux (state.Auth.loading)
@@ -15,16 +16,23 @@ export default function Login() {
   // 2. Control para saber cuándo redirigir al usuario tras el dispatch
   const [activated, setActivated] = useState(false);
 
+
+
+
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  //cuando hemos enviado un password request:
+  const [requestSent, setRequestSent] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
+    
   });
 
-  const { email, password } = formData;
+  const { email } = formData;
 
   // 3. Actualizamos el estado local al cambiar inputs
   const onChange = (e) =>
@@ -33,12 +41,13 @@ export default function Login() {
   // 4. Al hacer submit, lanzamos la acción de login y activamos la redirección
   const onSubmit = (e) => {
     e.preventDefault();
-    dispatch(login(email, password));
-    setActivated(true);
+    dispatch(reset_password(email));
+    setRequestSent(true); // ← Activamos el estado de request enviado
+ 
   };
 
   // 5. Si ya accionamos el login, redirigimos al home
-  if (activated) {
+  if (requestSent && !loading) {
     return <Navigate to="/" />;
   }
 
@@ -52,9 +61,9 @@ export default function Login() {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-            Sign in to your account
+            Recover your password
           </h2>
-          <span className="text-gray-900">¿Don't have an account? <Link className="text-blue-500" to="/signup">Sign up here</Link> </span>
+          <span className="text-gray-900">¿Recordaste tu contraseña? <Link className="text-blue-500" to="/login">Login here</Link> </span>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -71,6 +80,7 @@ export default function Login() {
                   value={email}
                   name="email"
                   type="email"
+                  placeholder="Email"
                   required
                   onChange={onChange}
                   className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -78,36 +88,7 @@ export default function Login() {
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm/6 font-medium text-gray-900"
-                >
-                  Password
-                </label>
-                <div className="text-sm">
-                  <Link
-                   to="/reset_password"
-                    className="font-semibold text-indigo-600 hover:text-indigo-500"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  value={password}
-                  onChange={onChange}
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
-            </div>
-
+          
             <div>
               {/* 6. Botón con condicional de loading
               
@@ -136,7 +117,7 @@ export default function Login() {
                   />
                 ) : (
                   // 8. Texto normal cuando no está cargando
-                  "Login"
+                  "Send email"
                 )}
               </button>
             </div>

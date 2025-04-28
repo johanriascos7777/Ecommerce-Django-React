@@ -63,7 +63,7 @@ export default function Signup() {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-            Sign in to your account
+            Register
           </h2>
         </div>
 
@@ -122,28 +122,23 @@ export default function Signup() {
                 </div>
               </div>
 
-     {/* Password */}
-     <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
-                  Password
-                </label>
-                <div className="text-sm">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
-              <div className="mt-2">
-                <input
-                  value={password}
-                  onChange={e => onChange(e)}
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                />
-              </div>
+      {/* Password */}
+      <div>
+        <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+          Password
+        </label>
+        <div className="mt-2">
+          <input
+            value={password}
+            onChange={e => onChange(e)}
+            id="password"
+            name="password"
+            type="password"
+            required
+            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+          />
+        </div>
+      </div>
 
 
               {/* Repeat Password */}
