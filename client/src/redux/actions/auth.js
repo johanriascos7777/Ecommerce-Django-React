@@ -13,6 +13,12 @@ import {
     AUTHENTICATED_FAIL,
     REFRESH_SUCCESS,
     REFRESH_FAIL,
+    RESET_PASSWORD_SUCCESS,
+    RESET_PASSWORD_FAIL,
+    RESET_PASSWORD_CONFIRM_SUCCESS,
+    RESET_PASSWORD_CONFIRM_FAIL,
+    LOGOUT,
+
 } from './types';
 
 import axios from 'axios';
@@ -293,4 +299,120 @@ export const refresh = () => async dispatch => {
             type: REFRESH_FAIL
         });
     }
+}
+
+export const reset_password = (email) => async dispatch => {
+    dispatch({
+        type: SET_AUTH_LOADING
+    });
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const body = JSON.stringify({ email });
+
+    try{
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/users/reset_password/`, body, config);
+        
+        if (res.status === 204) {
+            dispatch({
+                type: RESET_PASSWORD_SUCCESS
+            });
+            dispatch({
+                type: REMOVE_AUTH_LOADING
+            });
+            dispatch(setAlert('Password reset email sent', 'green'));
+        } else {
+            dispatch({
+                type: RESET_PASSWORD_FAIL
+            });
+            dispatch({
+                type: REMOVE_AUTH_LOADING
+            });
+            dispatch(setAlert('Error sending password reset email', 'red'));
+        }
+    }
+    catch(err){
+        dispatch({
+            type: RESET_PASSWORD_FAIL
+        });
+        dispatch({
+            type: REMOVE_AUTH_LOADING
+        });
+        dispatch(setAlert('Error sending password reset email', 'red'));
+    }
+}
+
+export const reset_password_confirm = (uid, token, new_password, re_new_password) => async dispatch => {
+    dispatch({
+      type: SET_AUTH_LOADING
+    });
+  
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+  
+    // Verificamos si las contraseñas coinciden primero
+    if (new_password !== re_new_password) {
+      dispatch({
+        type: RESET_PASSWORD_CONFIRM_FAIL
+      });
+      dispatch({
+        type: REMOVE_AUTH_LOADING
+      });
+      dispatch(setAlert('Passwords do not match', 'red'));
+    } else {
+      // Si las contraseñas coinciden, construimos el cuerpo de la petición
+      const body = JSON.stringify({
+        uid,
+        token,
+        new_password,
+        re_new_password
+      });
+  
+      try {
+        // Ahora sí, hacemos la petición POST al endpoint de confirmación de reseteo de contraseña
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/users/reset_password_confirm/`, body, config);
+  
+        if (res.status === 204) {
+          dispatch({
+            type: RESET_PASSWORD_CONFIRM_SUCCESS
+          });
+          dispatch({
+            type: REMOVE_AUTH_LOADING
+          });
+          dispatch(setAlert('Password has been reset successfully', 'green'));
+        } else {
+          dispatch({
+            type: RESET_PASSWORD_CONFIRM_FAIL
+          });
+          dispatch({
+            type: REMOVE_AUTH_LOADING
+          });
+          dispatch(setAlert('Error resetting your password', 'red'));
+        }
+      } catch(err){
+        dispatch({
+          type: RESET_PASSWORD_CONFIRM_FAIL
+        });
+        dispatch({
+          type: REMOVE_AUTH_LOADING
+        });
+        dispatch(setAlert('Error resetting your password', 'red'));
+      }
+    }
+  };
+  
+
+
+export const logout = () => dispatch => {
+    dispatch({
+        type: LOGOUT
+    });
+    dispatch(setAlert('Succesfully logged out', 'green'));
 }
