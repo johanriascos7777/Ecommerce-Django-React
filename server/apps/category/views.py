@@ -35,6 +35,6 @@ class ListCategoriesView(APIView):
 
                             item['sub_categories'].append(sub_item)
                     result.append(item)
-            return Response({'categories': result}, status=status.HTTP_200_OK)
+            return Response({'categories': result}, status=status.HTTP_200_OK) # En Redux, 'action.payload' será este objeto {'categories': result}. El reducer luego usa 'payload.categories' para asignar la lista 'result' a 'state.categories'.
         else:
             return Response({'error': 'No categories found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
