@@ -11,6 +11,7 @@ ENVIROMENT = env
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
+DOMAIN = os.environ.get('DOMAIN')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -28,7 +29,7 @@ DJANGO_APPS = [
 ]
 
 PROJECT_APPS = ['apps.user']
-ECOMMERCE_APPS = ['apps.category']
+ECOMMERCE_APPS = ['apps.category', 'apps.product']
 THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework',

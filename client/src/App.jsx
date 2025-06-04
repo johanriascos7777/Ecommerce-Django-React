@@ -6,6 +6,7 @@ import Login from "./containers/auth/Login"
 import Activate from "./containers/auth/Activate"
 import Reset_Password from "./containers/auth/ResetPassword";
 import Reset_Password_Confirm from "./containers/auth/ResetPasswordConfirm";
+import Shop from "./containers/pages/Shop"
 
 function App() {
 
@@ -28,7 +29,8 @@ function App() {
         <Route path="/activate/:uid/:token" element={<Activate/>} />
         <Route path="/reset_password" element={<Reset_Password/>} />
         <Route path="/password/reset/confirm/:uid/:token" element={<Reset_Password_Confirm/>} />
-     
+        
+         <Route path="/shop" element={<Shop/>} />
       </Routes>
 
 

@@ -90,8 +90,9 @@ export const Navbar = () => {
                 <div className="flex justify-between items-center max-w-6xl mx-auto">
                     <div className="flex gap-6 text-white">
                         <span>Elemento 1</span>
-                        <span>Elemento 2</span>
+                            <Link to="/shop"><span>Shop</span></Link>
                         <span>Elemento 3</span>
+                    
                         <span>Elemento 4</span>
                     </div>
 
