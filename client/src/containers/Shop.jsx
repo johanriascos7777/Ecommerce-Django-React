@@ -1,7 +1,7 @@
-import Layout from '../../hocs/Layout';
+import Layout from '../hocs/Layout';
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { get_categories } from '../../redux/actions/categories'; // Asegúrate que la ruta sea correcta
+import { get_categories } from '../redux/actions/categories'; // Asegúrate que la ruta sea correcta
 
 const Shop = () => {
   const dispatch = useDispatch();

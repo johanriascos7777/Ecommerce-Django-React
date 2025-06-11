@@ -6,7 +6,7 @@ import Login from "./containers/auth/Login"
 import Activate from "./containers/auth/Activate"
 import Reset_Password from "./containers/auth/ResetPassword";
 import Reset_Password_Confirm from "./containers/auth/ResetPasswordConfirm";
-import Shop from "./containers/pages/Shop"
+import Shop from "./containers/Shop";
 
 function App() {
 
