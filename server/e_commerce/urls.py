@@ -15,6 +15,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+# La linea anterior --  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  -- : crea el puente entre el servidor de desarrollo de Django y los archivos subimos, permitiendo que nuestro frontend independiente pueda acceder a los archivos multimedia (imágenes, videos, etc.) que subimos a través del panel de administración de Django.
+
+
 #NO necesito esta línea si el frontend se sirve desde otro dominio/puerto/servidor 7777
 #urlpatterns += [re_path(r'^.*',
 #                        TemplateView.as_view(template_name='index.html'))]

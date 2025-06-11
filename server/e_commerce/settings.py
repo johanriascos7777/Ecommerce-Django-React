@@ -16,6 +16,8 @@ DOMAIN = os.environ.get('DOMAIN')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+DOMAIN = os.environ.get('DOMAIN')
+
 ALLOWED_HOSTS = []
 
 # Application definition
