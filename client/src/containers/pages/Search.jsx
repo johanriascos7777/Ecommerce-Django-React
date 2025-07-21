@@ -310,13 +310,25 @@ const Search = () => {
 
       {/* Columna Derecha: Resultados */}
       <div className="bg-white">
+        
+
         <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Productos</h2>
-            <div className="mt-6">
-                {/* Esta función ahora usa la lógica inteligente que definimos */}
-                {showProducts()}
-            </div>
-        </div>
+    <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">
+    {
+        // Si el usuario aplicó un filtro EN ESTA PÁGINA, muestra "Resultados filtrados".
+        filtered
+        ? "Resultados filtrados"
+        // Si no, y si hay productos de la búsqueda del NAVBAR, muestra "Productos encontrados".
+        : (searched_products && searched_products.length > 0)
+        ? `Productos encontrados (${searched_products.length})`
+        // Si no se cumple nada (por ejemplo, al entrar a /search directamente), muestra un texto por defecto.
+        : "No hay resultados para mostrar"
+    }
+    </h2>
+    <div className="mt-6">
+        {showProducts()}
+    </div>
+</div>
         </div>
     </div>
     </Layout>

@@ -62,8 +62,8 @@ export const Navbar = () => {
       dispatch(get_search_products(search, category_id));
       
       // 🔗 Después de despachar la acción, redirigimos al usuario a la página de la tienda (o a una página de resultados).
-      // La página `/shop` ahora mostrará los productos filtrados por la búsqueda.
-      navigate('/shop');
+      // La página `/search` ahora mostrará los productos filtrados por la búsqueda.
+      navigate('/search');
     }
     // --- Fin de la lógica del SearchBox ---
 
