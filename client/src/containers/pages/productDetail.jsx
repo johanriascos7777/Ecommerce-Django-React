@@ -1,12 +1,33 @@
 import Layout from "../../hocs/Layout";
-import { useParams } from "react-router-dom";
+import { Oval } from "react-loader-spinner"; 
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { get_product, get_related_products } from "../../redux/actions/products";
-import { useEffect } from "react";
+import { get_items, add_item, get_total, get_item_total } from "../../redux/actions/cart";
+import { useEffect, useState  } from "react";
 import ImageGallery from "../../components/product/ImageGallery"; // Asegúrate de importar ImageGallery
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
+
+// CÓDIGO CORREGIDO en ProductDetail.jsx
+const addToCart = async () => {
+  if (product && product.quantity > 0) {
+      setLoading(true);
+      await dispatch(add_item(product));
+      await dispatch(get_items());
+      await dispatch(get_total());
+      await dispatch(get_item_total());
+      setLoading(false);
+      navigate('/cart');
+  }
+}
+
+
   const params = useParams();
   const productId = params.productId;
 
@@ -59,17 +80,48 @@ const ProductDetail = () => {
 
                   {/* Lógica para mostrar si hay stock (puedes añadirla más adelante) */}
                   <div className="mt-4">
-                    <p>
-                      {product.quantity > 0 ? (
-                        <span className='text-green-500'>En Stock</span>
+                                  <p className="mt-4">
+                  {
+                      product && 
+                      product !== null &&
+                      product !== undefined && 
+                      product.quantity > 0 ? (
+                          <span className='text-green-500'>
+                              In Stock
+                          </span>
                       ) : (
-                        <span className='text-red-500'>Agotado</span>
-                      )}
-                    </p>
+                          <span className='text-red-500'>
+                              Out of Stock
+                          </span>
+                      )
+                  }
+              </p>
+
                   </div>
                   
                   {/* Aquí irían los botones de 'Añadir al carrito', 'Añadir a la lista de deseos', etc. */}
-
+                     <button
+  onClick={addToCart}
+  // Deshabilitamos el botón mientras carga para evitar múltiples clics
+  disabled={loading}
+  // Añadimos clases para darle estilo, padding, color, etc.
+  className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+>
+  {loading ? (
+    <Oval
+      height={20}
+      width={20}
+      color="#fff" // Cambiado a blanco para que contraste con el fondo del botón
+      visible={true}
+      ariaLabel='oval-loading'
+      secondaryColor="#eee" // Un color secundario para el efecto visual
+      strokeWidth={3}
+      strokeWidthSecondary={3}
+    />
+  ) : (
+    "Añadir al carrito"
+  )}
+</button>
                 </>
               )}
             </div>

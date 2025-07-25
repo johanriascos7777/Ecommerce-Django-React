@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../../components/Alert';
 // 🧠 1. Importando los hooks de Redux que vamos a usar
 import { useSelector, useDispatch } from 'react-redux';
-import { MdArrowDropDown, MdPerson, MdExitToApp } from 'react-icons/md';
+import { MdArrowDropDown, MdPerson, MdExitToApp, MdShoppingCart } from 'react-icons/md';
 import { logout } from '../../redux/actions/auth';
 // ✅ 2. Importando la acción que queremos despachar para obtener las categorías
 import { get_categories } from '../../redux/actions/categories';
@@ -152,6 +152,9 @@ export const Navbar = () => {
                     </div>
 
                     <div className="flex gap-4">
+                        <Link to="/cart">
+                        <div className='bg-gray-700 p-2 rounded'><MdShoppingCart /></div>
+                        </Link>
                         {isAuthenticated ? authLinks : guestLinks}
                     </div>
                 </div>
