@@ -12,7 +12,7 @@ import { get_search_products } from '../../redux/actions/products';
 import SearchBox from './SearchBox';
 
 
-export const Navbar = () => {
+export const Navbar = ({ total_items }) => {
     // 🧠 `useDispatch` nos da la función `dispatch` directamente.
     // En el método clásico, necesitaríamos `mapDispatchToProps` o pasar un objeto de acciones a `connect`.
     // ¡Nos estamos ahorrando un montón de código repetitivo!
@@ -154,6 +154,7 @@ export const Navbar = () => {
                     <div className="flex gap-4">
                         <Link to="/cart">
                         <div className='bg-gray-700 p-2 rounded'><MdShoppingCart /></div>
+                        <span className="text-xs absolute top-1 mt-3 ml-4 bg-red-500 text-white font-semibold rounded-full px-2 text-center">{total_items}</span>
                         </Link>
                         {isAuthenticated ? authLinks : guestLinks}
                     </div>

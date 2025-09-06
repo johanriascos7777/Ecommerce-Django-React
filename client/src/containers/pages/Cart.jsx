@@ -147,6 +147,42 @@ En tu código, estás pasando la acción importada (update_item, remove_item) di
       <div>Total de artículos: {total_items}</div>
       <div>Subtotal: ${amount}</div>
       {showItems()}
+
+      <hr /> {/* Un separador simple */}
+
+            {/* =============== Order summary SIN ESTILOS =============== */}
+            <section aria-labelledby="summary-heading">
+              <h2 id="summary-heading">
+                Order summary
+              </h2>
+
+              <dl>
+                <div>
+                  <dt>Subtotal</dt>
+                  <dd>${compare_amount.toFixed(2)}</dd>
+                </div>
+                <div>
+                  <dt>
+                    <span>Shipping estimate</span>
+                  </dt>
+                  <dd>$5.00</dd>
+                </div>
+                <div>
+                  <dt>
+                    <span>Tax estimate</span>
+                  </dt>
+                  <dd>$8.32</dd>
+                </div>
+                <div>
+                  <dt>Order total</dt>
+                  <dd>${amount.toFixed(2)}</dd>
+                </div>
+              </dl>
+
+              <div>
+                {checkoutButton()}
+              </div>
+            </section>
     </Layout>
   )
 }
