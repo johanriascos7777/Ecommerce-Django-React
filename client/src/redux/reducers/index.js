@@ -4,6 +4,7 @@ import Alert from './alert'
 import Categories from './categories'
 import Products from './products'
 import Cart from "./cart";
+import Shipping from './shipping';
 
 
 export default combineReducers({
@@ -11,7 +12,7 @@ export default combineReducers({
     Alert,
     Categories,
     Products,
-    Cart
-
+    Cart,
+    Shipping
 
 })

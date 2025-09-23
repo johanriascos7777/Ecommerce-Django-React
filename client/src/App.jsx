@@ -10,6 +10,8 @@ import Shop from "./containers/Shop";
 import ProductDetail from "./containers/pages/productDetail";
 import Search from "./containers/pages/Search";
 import Cart from "./containers/pages/Cart";
+import Checkout from "./containers/pages/Checkout";
+import PrivateRoute from "./hocs/PrivateRoute";
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
 
         {/* CART */}
         <Route path="/cart" element={<Cart />} />
+      
+
 
         {/* AUTHENTICATION */}
         <Route path="/signup" element={<Signup/>} />
@@ -39,6 +43,17 @@ function App() {
          <Route path="/shop" element={<Shop/>} />
          <Route path="/product/:productId" element={<ProductDetail/>} />
           <Route path="/search" element={<Search/>} />
+
+        {/* ================================================================= */}
+        {/* ====================== RUTAS PROTEGIDAS ========================= */}
+        {/* ================================================================= */}
+   
+        <Route element={<PrivateRoute />}>
+          <Route path="/checkout" element={<Checkout />} />
+   
+        </Route>
+
+
       </Routes>
 
 

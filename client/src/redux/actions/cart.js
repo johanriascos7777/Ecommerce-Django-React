@@ -236,6 +236,13 @@ export const update_item = (item, count) => async dispatch => {
                     type: UPDATE_ITEM_SUCCESS,
                     payload: res.data
                 });
+
+                // ¡LA MAGIA! Refrescamos los totales después de actualizar
+                /*
+                dispatch(get_total());
+                dispatch(get_item_total());
+                */
+
             } else {
                 dispatch({
                     type: UPDATE_ITEM_FAIL
@@ -264,6 +271,11 @@ export const update_item = (item, count) => async dispatch => {
             type: UPDATE_ITEM,
             payload: cart
         });
+                // ¡LA MAGIA! Refrescamos los totales también para el carrito local
+                /*
+        dispatch(get_total());
+        dispatch(get_item_total());
+        */
     }
 }
 
@@ -291,6 +303,11 @@ export const remove_item = item => async dispatch => {
                     type: REMOVE_ITEM_SUCCESS,
                     payload: res.data
                 });
+                 // ¡AQUÍ FALTABA LA MAGIA! La añadimos también para usuarios logueados.
+                 /*
+                dispatch(get_total());
+                dispatch(get_item_total()); 
+                */
             } else {
                 dispatch({
                     type: REMOVE_ITEM_FAIL
@@ -319,6 +336,11 @@ export const remove_item = item => async dispatch => {
             type: REMOVE_ITEM,
             payload: new_cart
         });
+         // ¡LA MAGIA! Refrescamos los totales también para el carrito local
+         /*
+        dispatch(get_total());
+        dispatch(get_item_total());
+        */
     }
 }
 
