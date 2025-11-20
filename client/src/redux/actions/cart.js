@@ -33,7 +33,8 @@ export const add_item = product => async dispatch => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -96,7 +97,8 @@ export const get_items = () => async dispatch => {
         const config = {
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+               /* 'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+               'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -130,7 +132,8 @@ export const get_total = () => async dispatch => {
         const config = {
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -179,7 +182,8 @@ export const get_item_total = () => async dispatch => {
         const config = {
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -221,7 +225,8 @@ export const update_item = (item, count) => async dispatch => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -290,7 +295,8 @@ export const remove_item = item => async dispatch => {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+               /* 'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+               'Authorization': `Bearer ${localStorage.getItem('access')}`,
             },
             data: body
         };
@@ -349,7 +355,8 @@ export const empty_cart = () => async dispatch => {
         const config = {
             headers: {
                 'Accept': 'application/json',
-                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+                'Authorization': `Bearer ${localStorage.getItem('access')}`,
             }
         };
 
@@ -383,7 +390,8 @@ export const synch_cart = () => async dispatch => {
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `JWT ${localStorage.getItem('access')}`,
+            /*'Authorization': `JWT ${localStorage.getItem('access')}`,*/
+            'Authorization': `Bearer ${localStorage.getItem('access')}`,
         }
     };
 

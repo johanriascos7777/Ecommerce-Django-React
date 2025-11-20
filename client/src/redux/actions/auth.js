@@ -23,6 +23,7 @@ import {
 
 import axios from 'axios';
 import { setAlert } from './alert';
+import { synch_cart } from './cart'; 
 
 
 export const check_authenticated = () => async dispatch => {
@@ -158,7 +159,6 @@ export const load_user = () => async dispatch => {
 
 
 
-
 export const login = (email, password) => async dispatch => {
     dispatch({
         type: SET_AUTH_LOADING
@@ -178,11 +178,18 @@ export const login = (email, password) => async dispatch => {
         const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/jwt/create/`, body, config);
 
         if (res.status === 200) {
+            // 1. Login exitoso: Guardamos el token
             dispatch({
                 type: LOGIN_SUCCESS,
                 payload: res.data
             });
+
+            // 2. Cargamos los datos del usuario (nombre, email, etc)
             dispatch(load_user()); //Esta función se encarga de cargar los datos del usuario. ¡Pero se agrega luego de hacer creado el action load_user!
+
+            // 3. USAMOS LA FUNCIÓN IMPORTADA:
+            // Llamamos a synch_cart para que lo que estaba en el carrito local se vaya a la base de datos
+            dispatch(synch_cart());
 
             dispatch({
                 type: REMOVE_AUTH_LOADING
