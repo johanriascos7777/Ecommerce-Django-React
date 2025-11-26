@@ -70,14 +70,14 @@ export const Navbar = ({ total_items }) => {
 
     // Menú autenticado
     const authLinks = (
-        <div className="relative">
+        <div className="relative m-0">
             <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
             >
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden bg-gray-100">
                     <svg 
-                        className="h-full w-full text-gray-300" 
+                        className="h-full w-full text-[#333333]" 
                         fill="currentColor" 
                         viewBox="0 0 24 24"
                     >
@@ -85,10 +85,10 @@ export const Navbar = ({ total_items }) => {
                     </svg>
                 </span>
                 
-                <span className="text-black">
+                <span className="text-[#333333]">
                     {user?.name || 'Usuario'}
                 </span>
-                <MdArrowDropDown className="text-xl text-black" />
+                <MdArrowDropDown className="text-xl text-[#333333]" />
             </button>
             
             {isOpen && (
@@ -118,14 +118,14 @@ export const Navbar = ({ total_items }) => {
         <Fragment>
             <Link 
                 to="/login" 
-                className="flex items-center gap-1 text-white hover:text-gray-200"
+                className="flex items-center gap-1 text-[#333333] hover:text-gray-200"
             >
                 <MdPerson />
                 Ingresar
             </Link>
             <Link 
                 to="/signup" 
-                className="flex items-center gap-1 text-white hover:text-gray-200"
+                className="flex items-center gap-1 text-[#333333] hover:text-gray-200"
             >
                 <MdExitToApp />
                 Registrarse
@@ -135,7 +135,7 @@ export const Navbar = ({ total_items }) => {
 
     return (
         <Fragment>
-            <div className='w-full bg-slate-600 p-4'>
+            <div className='w-full max-w-7xl bg-white mr-auto ml-auto'>
                 <div className="flex justify-between items-center max-w-6xl mx-auto">
                     {/* 👇 Le pasamos las categorías y la lógica al SearchBox */}
                     <SearchBox 
@@ -145,16 +145,14 @@ export const Navbar = ({ total_items }) => {
                         onSubmit={onSubmit}
                     />
 
-                    <div className="flex gap-6 text-white items-center">
+                    <div className="flex gap-6 w-full ml-5 text-[#333333] items-center">
                         <Link to="/shop"><span>Shop</span></Link>
-                        <span>Elemento 3</span>
-                        <span>Elemento 4</span>
                     </div>
 
                     <div className="flex gap-4">
                         <Link to="/cart">
-                        <div className='bg-gray-700 p-2 rounded'><MdShoppingCart /></div>
-                        <span className="text-xs absolute top-1 mt-3 ml-4 bg-red-500 text-white font-semibold rounded-full px-2 text-center">{total_items}</span>
+                        <div className='p-2 rounded'><MdShoppingCart className="text-[24px] text-[#555555]" /></div>
+                        <span className="text-xs absolute top-1 mt-0 ml-5 bg-red-500 text-white font-semibold rounded-full px-2 text-center">{total_items}</span>
                         </Link>
                         {isAuthenticated ? authLinks : guestLinks}
                     </div>

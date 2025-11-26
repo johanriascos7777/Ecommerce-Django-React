@@ -84,3 +84,5 @@ Desktop.ini
 
 **/.spyderproject/
 **/.ropeproject/
+*storybook.log
+storybook-static
