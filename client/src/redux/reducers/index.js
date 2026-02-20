@@ -13,6 +13,11 @@ export default combineReducers({
     Categories,
     Products,
     Cart,
-    Shipping
-
+    Shipping,
+    Payment,
+    Orders,
+    Coupons,
+    Profile,
+    Wishlist,
+    Reviews
 })

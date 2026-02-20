@@ -1,236 +1,353 @@
 import Layout from '../../hocs/Layout';
-import {get_items, get_total, get_item_total, remove_item, update_item} from '../../redux/actions/cart'
+import { Navigate } from 'react-router';
+import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
+
+// Componentes
 import CartItem from '../../components/cart/CartItem';
-import { Link } from 'react-router-dom';
+import ShippingForm from '../../components/checkout/ShippingForm';
+
+// Acciones del carrito
+import { get_items, get_total, get_item_total, update_item, remove_item } from '../../redux/actions/cart';
 import { setAlert } from '../../redux/actions/alert';
+
+// Acciones de envío
 import { get_shipping_options } from '../../redux/actions/shipping';
+
+// Acciones de autenticación (para refrescar el token si es necesario)
+import { refresh } from '../../redux/actions/auth';
+
+// Acciones de pago: obtener total, token de braintree y procesar pago
+import { get_payment_total, get_client_token, process_payment } from '../../redux/actions/payment';
+
+// Acción para validar cupones de descuento
+import { check_coupon } from '../../redux/actions/coupons';
+
+// Lista fija de países para el formulario de envío
+import { countries } from '../../helpers/fixedCountries';
+
+// Componente de pago de Braintree (requiere: npm install braintree-web-drop-in-react)
+import DropIn from 'braintree-web-drop-in-react';
 
 
 const Checkout = () => {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  // 1. OBTENEMOS DATOS DEL SLICE 'Cart'
-  // useSelector ya se encarga de que el componente se actualice cuando estos datos cambien.
-  const { items, amount, compare_amount, total_items } = useSelector(state => state.Cart);
+    // ─── ESTADO GLOBAL (Redux) ────────────────────────────────────────────────
 
-  // ==================================================================
-  // 2. LA SOLUCIÓN: OBTENER DATOS DEL SLICE 'Auth'
-  // Le pedimos a Redux que nos de el estado de autenticación.
-  // Asumimos que tu slice de autenticación se llama 'Auth'. Si se llama 'Authentication'
-  // o de otra forma, solo tienes que cambiar state.Auth por el nombre correcto.
-  // ==================================================================
-  const { isAuthenticated } = useSelector(state => state.Auth);
+    // Datos de autenticación
+    const { isAuthenticated, user } = useSelector(state => state.Auth);
 
-  // 3. OBTENEMOS LAS OPCIONES DE ENVÍO DEL SLICE 'Shipping'
-  // El slice Shipping guarda en 'shipping' el array de opciones que devuelve el backend.
-  const { shipping } = useSelector(state => state.Shipping);
+    // Items del carrito y total de artículos
+    const { items, total_items } = useSelector(state => state.Cart);
 
-  /*SE COMENTA PARA SUSTITUIR POR USE SELECTOR DE ARRIBA
-  const cartState = useSelector(state => state.Cart)
-  */
+    // Opciones de envío que llegan del backend
+    const { shipping } = useSelector(state => state.Shipping);
 
-  /*SE COMENTA PARA SUSTITUIR POR USE SELECTOR DE ARRIBA
-  // Accede a las propiedades del estado del carrito
-  const cartItems = cartState.items;
-  const amount = cartState.amount;        
-  const compareAmount = cartState.compare_amount;
-  const totalItems = cartState.total_items;
-  */
+    // Estado del pago: token de braintree, si ya se hizo el pago, loading, y los totales
+    const {
+        clientToken,
+        made_payment,
+        loading,
+        original_price,
+        total_after_coupon,
+        total_amount,
+        total_compare_amount,
+        estimated_tax,
+        shipping_cost,
+    } = useSelector(state => state.Payment);
 
-  // 4. ESTADO LOCAL DEL FORMULARIO
-  // shipping_id guarda la opción de envío que el usuario seleccione con los radio buttons.
-  // Empieza en 0 (ninguna opción seleccionada).
-  const [formData, setFormData] = useState({
-    shipping_id: 0,
-  });
-
-  const { shipping_id } = formData;
-
-  // Manejador genérico para cualquier input/select/radio del formulario
-  const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  useEffect(() => {
-
-    // Despachamos las acciones para obtener los datos del carrito
-    dispatch(get_items());
-    dispatch(get_total());
-    dispatch(get_item_total());
-
-    // Cargamos las opciones de envío disponibles desde el backend.
-    // No necesita argumentos: solo trae la lista de opciones (ej: "Express $10 - 2 días").
-    dispatch(get_shipping_options());
-
-    // ⛔ NO DESCOMENTAR ESTAS LÍNEAS - ERROR DE DISEÑO:
-    // remove_item(item) y update_item(item, count) REQUIEREN argumentos obligatorios.
-    // Llamarlos aquí sin argumentos causaría: "Cannot read properties of undefined"
-    // porque internamente intentan acceder a item.product.id y item.product.quantity.
-    //
-    // Estas acciones NO son de "carga inicial", sino de "respuesta a eventos del usuario".
-    // Se ejecutan correctamente desde CartItem a través de los handlers:
-    //   → handleRemoveItem(item)       en el botón "Remove"
-    //   → handleUpdateItem(item, count) en el formulario "Update"
-    //
-    /* dispatch(remove_item());
-    dispatch(update_item()); */
-    /* Pasa funciones que despachen acciones a CartItem:
-    En tu código, estás pasando la acción importada (update_item, remove_item) directamente como prop. Lo correcto es pasar una nueva función que, cuando se llame, despache esa acción.*/
-
-  },[dispatch]); // Es buena práctica añadir 'dispatch' a las dependencias.
+    // Cupón aplicado (si existe)
+    const { coupon } = useSelector(state => state.Coupons);
 
 
-  // Función para manejar la eliminación de un ítem.
-  // Esta es la función que pasaremos como prop a CartItem.
-  const handleRemoveItem = (item) => {
-    // Aquí sí usamos dispatch para enviar la acción.
-    dispatch(remove_item(item));
-  };
+    // ─── ESTADO LOCAL ─────────────────────────────────────────────────────────
 
-  // Función para manejar la actualización de un ítem.
-  const handleUpdateItem = (item, count) => {
-    dispatch(update_item(item, count));
-  };
+    // Datos del formulario de envío y dirección
+    const [formData, setFormData] = useState({
+        full_name: '',
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state_province_region: '',
+        postal_zip_code: '',
+        country_region: 'Colombia',   // ← cambia al país por defecto que prefieras
+        telephone_number: '',
+        coupon_name: '',
+        shipping_id: 0,               // 0 = ninguna opción de envío seleccionada
+    });
 
-  const showItems = () => {
-    return(
-      <div>
-        {
-          items && 
-          items !== null && 
-          items !== undefined && 
-          items.length !== 0 && 
-          items.map((item, index)=>{
-            let count = item.count;
-            return (
-              <div key={index}>
-                <CartItem 
-                  item={item}
-                  count={count}
-                  update_item={handleUpdateItem}
-                  remove_item={handleRemoveItem}
-                  setAlert={setAlert}
-                />
-              </div>
-            );
-          })
-        }
-      </div>
-    )
-  }
+    const {
+        full_name,
+        address_line_1,
+        address_line_2,
+        city,
+        state_province_region,
+        postal_zip_code,
+        country_region,
+        telephone_number,
+        coupon_name,
+        shipping_id,
+    } = formData;
 
-  // Renderiza los radio buttons con las opciones de envío que llegaron del backend.
-  // Cada opción muestra: nombre - precio (tiempo de entrega).
-  // Al seleccionar una, onChange actualiza shipping_id en el estado local del formulario.
-  const renderShipping = () => {
-    if (shipping && shipping !== null && shipping !== undefined) {
-      return (
-        <div className='mb-5'>
-          {
-            shipping.map((shipping_option, index) => (
-              <div key={index} className="flex items-center mb-2">
-                <input
-                  onChange={e => onChange(e)}
-                  value={shipping_option.id}
-                  name='shipping_id'
-                  type='radio'
-                  required
-                />
-                <label className='ml-4'>
-                  {shipping_option.name} - ${shipping_option.price} ({shipping_option.time_to_delivery})
-                </label>
-              </div>
-            ))
-          }
-        </div>
-      );
-    }
-  };
+    // Instancia del widget de Braintree (se llena cuando DropIn está listo)
+    const [data, setData] = useState({ instance: {} });
 
-  const checkoutButton = () => {
-    if (total_items < 1) {
-      return(
-        <>
-          <Link to='/shop'>
-            <button className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
-              Buscar items
-            </button>
-          </Link>
-        </>
-      )
-    } else if (!isAuthenticated) {
-      return(
-        <>
-          <Link to='/login'>
-            <button className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
-              Login
-            </button>
-          </Link>
-        </>
-      )
-    } else {
-      return(
-        <>
-          <Link to='/checkout'>
-            <button className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500">
-              Checkout
-            </button>
-          </Link>
-        </>
-      )
-    }
-  }
+    // Manejador genérico para cualquier input del formulario
+    const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  return (
-    <Layout>
-      <h1 className="text-2xl font-bold text-cyan-500">CHECKOUT</h1>
-      <div>Total de artículos: {total_items}</div>
-      <div>Subtotal: ${amount}</div>
-      {showItems()}
 
-      <hr /> {/* Un separador simple */}
+    // ─── EFECTOS ──────────────────────────────────────────────────────────────
 
-      {/* =============== Order summary SIN ESTILOS =============== */}
-      <section aria-labelledby="summary-heading">
-        <h2 id="summary-heading">
-          Order summary
-        </h2>
+    useEffect(() => {
+        // Al montar el componente: subimos al tope de la página y cargamos opciones de envío
+        window.scrollTo(0, 0);
+        dispatch(get_items());
+        dispatch(get_total());
+        dispatch(get_item_total());
+        dispatch(get_shipping_options());
+    }, [dispatch]);
 
-        <dl>
-          {/* =============== SHIPPING OPTIONS =============== 
-              renderShipping() muestra los radio buttons con las opciones de envío.
-              Cuando el usuario seleccione una, shipping_id se actualizará en el formData.
-              Más adelante, shipping_id se usará en get_payment_total() para calcular
-              el total incluyendo el costo del envío seleccionado. */}
-          <div className="mb-4 text-2xl text-purple-600 font-bold">
-            SHIPPING OPTIONS
-          </div>
-          {renderShipping()}
+    useEffect(() => {
+        // Cuando el usuario esté cargado, pedimos el token de Braintree para mostrar el widget de pago
+        dispatch(get_client_token());
+    }, [user]);
 
-          <div>
-            <dt>
-              <span>Shipping estimate</span>
-            </dt>
-            <dd>$5.00</dd>
-          </div>
-          <div>
-            <dt>
-              <span>Tax estimate</span>
-            </dt>
-            <dd>$8.32</dd>
-          </div>
-          <div>
-            <dt>Order total</dt>
-            <dd>${amount.toFixed(2)}</dd>
-          </div>
-        </dl>
+    useEffect(() => {
+        // Recalculamos el total cada vez que cambia el envío o el cupón aplicado
+        if (coupon && coupon !== null && coupon !== undefined)
+            dispatch(get_payment_total(shipping_id, coupon.name));
+        else
+            dispatch(get_payment_total(shipping_id, 'default'));
+    }, [shipping_id, coupon]);
 
+
+    // ─── HANDLERS ─────────────────────────────────────────────────────────────
+
+    // Eliminar un ítem del carrito
+    const handleRemoveItem = (item) => {
+        dispatch(remove_item(item));
+    };
+
+    // Actualizar la cantidad de un ítem
+    const handleUpdateItem = (item, count) => {
+        dispatch(update_item(item, count));
+    };
+
+    // Validar y aplicar el cupón ingresado
+    const apply_coupon = async e => {
+        e.preventDefault();
+        dispatch(check_coupon(coupon_name));
+    };
+
+    // Procesar el pago al enviar el formulario
+    const buy = async e => {
+        e.preventDefault();
+
+        // Pedimos el nonce (token de un solo uso) al widget de Braintree
+        let nonce = await data.instance.requestPaymentMethod();
+
+        // Si hay cupón aplicado, lo mandamos; si no, mandamos string vacío
+        const couponToSend = (coupon && coupon !== null && coupon !== undefined)
+            ? coupon.name
+            : '';
+
+        dispatch(process_payment(
+            nonce,
+            shipping_id,
+            couponToSend,
+            full_name,
+            address_line_1,
+            address_line_2,
+            city,
+            state_province_region,
+            postal_zip_code,
+            country_region,
+            telephone_number
+        ));
+    };
+
+
+    // ─── RENDERS AUXILIARES ───────────────────────────────────────────────────
+
+    // Lista de items del carrito
+    const showItems = () => (
         <div>
-          {checkoutButton()}
+            {items &&
+                items !== null &&
+                items !== undefined &&
+                items.length !== 0 &&
+                items.map((item, index) => (
+                    <div key={index}>
+                        <CartItem
+                            item={item}
+                            count={item.count}
+                            update_item={handleUpdateItem}
+                            remove_item={handleRemoveItem}
+                            setAlert={setAlert}
+                        />
+                    </div>
+                ))
+            }
         </div>
-      </section>
-    </Layout>
-  )
-}
+    );
 
-export default Checkout
+    // Radio buttons con las opciones de envío del backend
+    const renderShipping = () => {
+        if (shipping && shipping !== null && shipping !== undefined) {
+            return (
+                <div className='mb-5'>
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Selecciona tu método de envío:</p>
+                    {shipping.map((shipping_option, index) => (
+                        <div key={index} className="flex items-center mb-2">
+                            <input
+                                onChange={e => onChange(e)}
+                                value={shipping_option.id}
+                                name='shipping_id'
+                                type='radio'
+                                required
+                                className="h-4 w-4 text-indigo-600"
+                            />
+                            <label className='ml-3 text-sm text-gray-700'>
+                                {shipping_option.name} — <span className="font-medium">${shipping_option.price}</span>{' '}
+                                <span className="text-gray-400">({shipping_option.time_to_delivery})</span>
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+    };
+
+    // Widget de pago de Braintree o botones de carga/login según el estado
+    const renderPaymentInfo = () => {
+        if (!clientToken) {
+            // Aún no tenemos el token: mostramos un indicador simple
+            if (!isAuthenticated) {
+                return (
+                    <Link
+                        to="/login"
+                        className="block w-full text-center bg-gray-600 text-white py-3 px-4 rounded-md text-sm font-medium hover:bg-gray-700"
+                    >
+                        Inicia sesión para continuar
+                    </Link>
+                );
+            } else {
+                return (
+                    <button
+                        disabled
+                        className="w-full bg-indigo-400 text-white py-3 px-4 rounded-md text-sm font-medium cursor-not-allowed"
+                    >
+                        Cargando método de pago...
+                    </button>
+                );
+            }
+        } else {
+            // Tenemos el token: mostramos el widget de Braintree y el botón de compra
+            return (
+                <>
+                    {/* Widget de Braintree: muestra tarjeta de crédito, PayPal, etc. */}
+                    <DropIn
+                        options={{
+                            authorization: clientToken,
+                            paypal: { flow: 'vault' }
+                        }}
+                        onInstance={instance => (data.instance = instance)}
+                    />
+
+                    <div className="mt-4">
+                        {loading ? (
+                            // Mientras se procesa el pago mostramos el botón deshabilitado
+                            <button
+                                disabled
+                                className="w-full bg-indigo-400 text-white py-3 px-4 rounded-md text-sm font-medium cursor-not-allowed"
+                            >
+                                Procesando pago...
+                            </button>
+                        ) : (
+                            // Botón principal de compra
+                            <button
+                                type="submit"
+                                className="w-full bg-green-600 text-white py-3 px-4 rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                            >
+                                Realizar pedido
+                            </button>
+                        )}
+                    </div>
+                </>
+            );
+        }
+    };
+
+
+    // ─── GUARDS ───────────────────────────────────────────────────────────────
+
+    // Si no está autenticado, redirigimos al inicio
+    if (!isAuthenticated)
+        return <Navigate to='/' />;
+
+    // Si el pago fue exitoso, redirigimos a la página de agradecimiento
+    if (made_payment)
+        return <Navigate to='/thankyou' />;
+
+
+    // ─── RENDER PRINCIPAL ─────────────────────────────────────────────────────
+
+    return (
+        <Layout>
+            <div className="bg-white max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+                <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+
+                <div className="lg:grid lg:grid-cols-12 lg:gap-10">
+
+                    {/* ── Columna izquierda: items del carrito ── */}
+                    <section className="lg:col-span-7">
+                        <h2 className="text-lg font-semibold text-gray-700 mb-4">
+                            Tu carrito ({total_items} {total_items === 1 ? 'artículo' : 'artículos'})
+                        </h2>
+
+                        {/* Mostramos los items o un mensaje si está vacío */}
+                        {items && items.length > 0
+                            ? <ul className="divide-y divide-gray-200 border-t border-b border-gray-200">
+                                {showItems()}
+                              </ul>
+                            : <p className="text-gray-400 text-sm">No tienes artículos en tu carrito.</p>
+                        }
+                    </section>
+
+                    {/* ── Columna derecha: resumen + formulario de envío + pago ── */}
+                    {/* ShippingForm contiene: cupón, totales, dirección y el widget de pago */}
+                    <ShippingForm
+                        full_name={full_name}
+                        address_line_1={address_line_1}
+                        address_line_2={address_line_2}
+                        city={city}
+                        state_province_region={state_province_region}
+                        postal_zip_code={postal_zip_code}
+                        telephone_number={telephone_number}
+                        countries={countries}
+                        onChange={onChange}
+                        buy={buy}
+                        user={user}
+                        renderShipping={renderShipping}
+                        total_amount={total_amount}
+                        total_after_coupon={total_after_coupon}
+                        total_compare_amount={total_compare_amount}
+                        estimated_tax={estimated_tax}
+                        shipping_cost={shipping_cost}
+                        shipping_id={shipping_id}
+                        shipping={shipping}
+                        renderPaymentInfo={renderPaymentInfo}
+                        coupon={coupon}
+                        apply_coupon={apply_coupon}
+                        coupon_name={coupon_name}
+                    />
+
+                </div>
+            </div>
+        </Layout>
+    );
+};
+
+export default Checkout;

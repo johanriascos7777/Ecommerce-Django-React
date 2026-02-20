@@ -15,6 +15,8 @@
     "@headlessui/react": "^2.2.4",
     "@heroicons/react": "^2.2.0",
     "axios": "^1.7.9",
+    "braintree-web-drop-in-react": "^1.2.1",
+    "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
@@ -36,6 +38,8 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/browser-playwright": "^4.0.13",
+    "@vitest/coverage-v8": "^4.0.13",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
@@ -43,14 +47,12 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "eslint-plugin-storybook": "^10.0.8",
     "globals": "^15.14.0",
+    "playwright": "^1.56.1",
     "postcss": "^8.4.49",
     "prop-types": "^15.8.1",
     "storybook": "^10.0.8",
     "tailwindcss": "^3.4.17",
     "vite": "^6.0.5",
-    "vitest": "^4.0.13",
-    "playwright": "^1.56.1",
-    "@vitest/browser-playwright": "^4.0.13",
-    "@vitest/coverage-v8": "^4.0.13"
+    "vitest": "^4.0.13"
   }
 }
