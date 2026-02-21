@@ -35,7 +35,7 @@ import {
   clear_wishlist
 } from './wishlist';
 import { setAlert } from './alert';
-import { synch_cart } from './cart'; 
+
 
 
 export const check_authenticated = () => async dispatch => {
