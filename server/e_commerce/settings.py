@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import timedelta
 import os
 import environ
 
@@ -31,7 +32,7 @@ DJANGO_APPS = [
 ]
 
 PROJECT_APPS = ['apps.user']
-ECOMMERCE_APPS = ['apps.category', 'apps.product', 'apps.cart','apps.shipping', 'apps.orders', 'apps.payment', 'apps.coupons']
+ECOMMERCE_APPS = ['apps.category', 'apps.product', 'apps.cart','apps.shipping', 'apps.orders', 'apps.payment', 'apps.coupons', 'apps.user_profile', 'apps.wishlist', 'apps.reviews'] #, 'apps.reviews'
 THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework',
@@ -164,6 +165,16 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer', ),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10080),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESFH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_TOKEN_CLASSES': (
+        'rest_framework_simplejwt.tokens.AccessToken',
+    )
+}
 
 AUTH_USER_MODEL="user.UserAccount"
 
@@ -181,7 +192,27 @@ if not DEBUG:
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
 
 
+# ✅ AWS S3
+    # AWS_QUERYSTRING_AUTH = False
 
+    # AWS settings
+    # AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    # AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    # AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME')
+
+    # AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    # AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    # AWS_DEFAULT_ACL = 'public-read'
+
+    # S3 static settings
+    # STATIC_LOCATION = 'static'
+    # STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+    # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+    # S3 public media settings
+    # PUBLIC_MEDIA_LOCATION = 'media'
+    # MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    # DEFAULT_FILE_STORAGE = 'core.storage_backends.MediaStore'
 
 
 

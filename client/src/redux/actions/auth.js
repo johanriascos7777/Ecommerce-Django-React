@@ -22,6 +22,18 @@ import {
 } from './types';
 
 import axios from 'axios';
+import {
+  get_items,
+  get_total,
+  get_item_total,
+  synch_cart
+} from './cart';
+
+import {
+  get_wishlist_items,
+  get_wishlist_item_total,
+  clear_wishlist
+} from './wishlist';
 import { setAlert } from './alert';
 import { synch_cart } from './cart'; 
 
@@ -187,6 +199,8 @@ export const login = (email, password) => async dispatch => {
             // 2. Cargamos los datos del usuario (nombre, email, etc)
             dispatch(load_user()); //Esta función se encarga de cargar los datos del usuario. ¡Pero se agrega luego de hacer creado el action load_user!
 
+            dispatch(get_wishlist_items());          // ✅ agregar
+            dispatch(get_wishlist_item_total());     // ✅ agregar
             // 3. USAMOS LA FUNCIÓN IMPORTADA:
             // Llamamos a synch_cart para que lo que estaba en el carrito local se vaya a la base de datos
             dispatch(synch_cart());
