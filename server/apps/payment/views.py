@@ -244,7 +244,7 @@ class ProcessPaymentView(APIView):
             newTransaction = gateway.transaction.sale(
                 {
                     'amount': str(total_amount),
-                    'payment_method_nonce': str(nonce['nonce']),
+                    'payment_method_nonce': str(nonce),  # ✅ CORREGIDO
                     'options': {
                         'submit_for_settlement': True
                     }

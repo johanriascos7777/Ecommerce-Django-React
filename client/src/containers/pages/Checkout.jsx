@@ -142,30 +142,39 @@ const Checkout = () => {
     };
 
     // Procesar el pago al enviar el formulario
+   // Procesar el pago al enviar el formulario
     const buy = async e => {
         e.preventDefault();
 
-        // Pedimos el nonce (token de un solo uso) al widget de Braintree
-        let nonce = await data.instance.requestPaymentMethod();
+        try {
+            // Pedimos el método de pago al widget de Braintree
+            // Nota: requestPaymentMethod() devuelve un objeto payload, no directamente el string nonce
+            const payload = await data.instance.requestPaymentMethod();
+            const nonce = payload.nonce;
 
-        // Si hay cupón aplicado, lo mandamos; si no, mandamos string vacío
-        const couponToSend = (coupon && coupon !== null && coupon !== undefined)
-            ? coupon.name
-            : '';
+            // Si hay cupón aplicado, lo mandamos; si no, mandamos string vacío
+            const couponToSend = (coupon && coupon !== null && coupon !== undefined)
+                ? coupon.name
+                : '';
 
-        dispatch(process_payment(
-            nonce,
-            shipping_id,
-            couponToSend,
-            full_name,
-            address_line_1,
-            address_line_2,
-            city,
-            state_province_region,
-            postal_zip_code,
-            country_region,
-            telephone_number
-        ));
+            dispatch(process_payment(
+                nonce,
+                shipping_id,
+                couponToSend,
+                full_name,
+                address_line_1,
+                address_line_2,
+                city,
+                state_province_region,
+                postal_zip_code,
+                country_region,
+                telephone_number
+            ));
+        } catch (error) {
+            console.error("Error solicitando el método de pago:", error);
+            // Opcional: mostrar una alerta roja al usuario
+            dispatch(setAlert('Por favor, selecciona o ingresa un método de pago válido', 'red'));
+        }
     };
 
 
@@ -248,13 +257,41 @@ const Checkout = () => {
             return (
                 <>
                     {/* Widget de Braintree: muestra tarjeta de crédito, PayPal, etc. */}
-                    <DropIn
-                        options={{
-                            authorization: clientToken,
-                            paypal: { flow: 'vault' }
-                        }}
-                        onInstance={instance => (data.instance = instance)}
-                    />
+                    {/* 
+    ══════════════════════════════════════════════════════════════════
+    🔧 CONFIGURACIÓN DEL FLUJO DE PAGO DE PAYPAL EN BRAINTREE SANDBOX
+    ══════════════════════════════════════════════════════════════════
+
+    Tienes dos opciones para el campo `flow`. Usa UNA a la vez:
+
+    ┌─────────────────────────────────────────────────────────────┐
+    │  flow: 'checkout'  ← ACTIVO AHORA (desarrollo/sandbox)     │
+    │                                                             │
+    │  ✅ NO requiere vincular una cuenta PayPal Sandbox real.    │
+    │  ✅ Braintree usa un flujo PayPal simulado (mock) interno.  │
+    │  ✅ Ideal para desarrollo y pruebas locales.                │
+    │  ✅ Pago único, no guarda el método de pago.               │
+    └─────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────┐
+    │  flow: 'vault'  ← COMENTADO (producción o linked sandbox)  │
+    │                                                             │
+    │  ❌ SÍ requiere una cuenta PayPal Sandbox vinculada         │
+    │     a Braintree en: Settings → Processing → PayPal.        │
+    │  ✅ Guarda el método de pago para cobros futuros.          │
+    │  ✅ Recomendado para producción.                           │
+    │  ⚠️  Sin la vinculación lanza: PAYPAL_SANDBOX_NOT_LINKED   │
+    └─────────────────────────────────────────────────────────────┘
+*/}
+
+<DropIn
+    options={{
+        authorization: clientToken,
+        paypal: { flow: 'checkout' }   // ✅ SANDBOX sin cuenta vinculada
+        // paypal: { flow: 'vault' }   // 🔒 PRODUCCIÓN - requiere cuenta PayPal vinculada
+    }}
+    onInstance={instance => (data.instance = instance)}
+/>
 
                     <div className="mt-4">
                         {loading ? (
